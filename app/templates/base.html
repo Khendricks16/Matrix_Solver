@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+    <body>
+        <header><h1>Matrix Solver</h1></header>
+        <section>
+            <div id="content">
+                <div id="page-options">
+                    <nav>
+                        <button type="button" onclick="window.location.href='/'">Welcome</button>
+                        <button type="button" onclick="window.location.href='/3x3Solver'">3x3 Matrix</button>
+                        <button type="button" onclick="window.location.href='/4x4Solver'">4x4 Matrix</button>
+                        <button type="button" onclick="window.location.href='/nxnSolver'">nxn Matrix</button>
+                        <button type="button" onclick="window.location.href='/how-to-solve?'">How To Solve?</button>
+                    </nav>
+                </div>
+                <main>
+                    <div id="matrix-content">
+                        <div id="matrix" class="grid-container">
+                            {% block matrix %}{% endblock %}
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </section>
+        <footer><hr>Made By: Keith Hendricks</footer>
+    </body>
+</html>
