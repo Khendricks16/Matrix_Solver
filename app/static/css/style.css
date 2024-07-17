@@ -1,33 +1,8 @@
+/* Base styles */
 :root {
     background-color: #F8F9FA;
 }
 
-/* classes */ 
-.grid-container {
-    display: grid;
-    grid-template-columns: auto auto auto;
-}
-
-.grid-item {
-    border: 1px solid rgba(0, 0, 0, 0.8);
-    font-size: 30px;
-    text-align: center;
-}
-
-
-/* ids */
-#page-options {
-    border: 2px solid black;
-    height: 50px;
-    display: flex;
-}
-
-#matrix {
-    border: 2px solid black;
-    width: 45%;
-}
-
-/* elements */ 
 h1 {
     text-align: center;
     line-height: 5vh;
@@ -40,12 +15,30 @@ header {
 }
 
 section {
-    background-color: #6C757D;
-    height: 80vh;
-    margin-left: 100px;
-    margin-right: 100px;
+    height: 100%;
 }
 
 footer {
     height: 10vh;
 }
+
+
+/* Layout */
+#content {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: #6C757D;
+    height: 80vh;
+
+}
+
+
+#page-options {
+    display: flex;
+    align-items: center;
+    border: 2px solid black;
+    height: 50px;
+    
+}
+

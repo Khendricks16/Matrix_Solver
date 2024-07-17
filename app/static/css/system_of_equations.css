@@ -1,0 +1,94 @@
+/* Specific Elements */
+#matrix-dimensions {
+    padding: 20px;
+}
+
+.grid-item {
+    border: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+#matrix-values-submit {
+    margin: 50px;
+}
+
+#left-matrix-bracket, #right-matrix-bracket{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#left-vertical-line, #left-matrix-bracket {
+    margin-right: 10px;
+}
+
+#right-vertical-line, #right-matrix-bracket {
+    margin-left: 10px;
+}
+
+#row-operations-scroll {
+    overflow-y: auto;
+    background-color: gray;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    height: 80%;
+    
+}
+
+/* Layout */
+
+#matrix-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#matrix-values {
+    display: grid;
+    gap: 5px;
+    justify-content: center; 
+    align-content: center;
+}
+
+#matrix-form {
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Classes */
+.number-entry {
+    text-align: center;
+    width: 50px;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    margin: 0 auto;
+}
+
+.method-option {
+    margin-bottom: 20px;
+}
+
+.method-option label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.method-option input[type="radio"] {
+    margin-right: 10px;
+}
+
+
+.horizontal-line {
+    width: auto;
+    height: 2px;    
+    background-color: black;
+
+}
+
+.vertical-line {
+    width: 2px;
+    background-color: black;
+}

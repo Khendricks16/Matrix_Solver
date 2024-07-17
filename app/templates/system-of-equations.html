@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %} System of Equations{% endblock %}
+{%block css_files %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/system_of_equations.css') }}">
+{% endblock %}
+
+
+{% block main_content %}
+<section id="elimination-techniques">
+    <h3>Elimination Techniques</h3>
+    <hr>
+    <p>Select a following type:</p>
+    <form action="/system-of-equations?m={{dimensions[0]}}&n={{dimensions[1]}}" method="post" id="solving-method" class="form-container">
+        <label><input type="radio" id="gaussian-elimination" name="method">Gaussian Elimination</label>
+        <label><input type="radio" id="gauss-jordan-elimination" name="method">Gauss-Jordan Elimination</label>
+    </form>
+    <script src="{{ url_for('static', filename='js/radio_button.js') }}"></script>
+
+</section>
+<section id="matrix-content">
+    <div id="matrix-dimensions">
+        <h1 >Enter Dimension for Augmented Matrix:</h1>
+        <p>Note: Dimensions can only go up to 10.</p>
+        <form action="/system-of-equations" method="get" id="dimension_form">  
+            <label for="m-btn">(rows) m: </label>
+            <input type="text" name="m" id="m-btn" class="number-entry">
+            <label for="n-btn">(columns) n: </label>
+            <input type="text" name="n" id="n-btn" class="number-entry">
+            <input type="submit" value="Enter">
+        </form>
+    </div>
+    <div id="matrix">
+        {% if dimensions %} 
+            <form action="/system-of-equations?m={{dimensions[0]}}&n={{dimensions[1]}}" method="post" id="matrix-form">
+                <div id="left-matrix-bracket">
+                    <div class="horizontal-line"></div>
+                    <div class="vertical-line" id="left-vertical-line"></div>
+                    <div class="horizontal-line"></div>
+                </div>
+                <div id="matrix-values">
+                    {% for i in range(dimensions[0] * dimensions[1]) %}
+                    <input class="grid-item number-entry" type="text" id="num_{{i}}" name="num_{{i}}">
+                    {% endfor %}
+                </div>
+                <div id="right-matrix-bracket">
+                    <div class="horizontal-line"></div>
+                    <div class="vertical-line" id="right-vertical-line"></div>
+                    <div class="horizontal-line"></div>
+                </div>
+                <input id="matrix-values-submit" type="submit" value="Enter Matrix Values">
+            </form>
+            <script src="{{ url_for('static', filename='js/update_matrix_dimension.js') }}"></script>
+        {% endif %}
+    </div>
+</section>
+<section id="row-operations">
+    <h1>Row Operations</h1>
+    <div id="row-operations-scroll">
+        <button>Button 1</button>
+        <button>Button 2</button>
+        <button>Button 3</button>
+    </div>
+</section>
+
+{% endblock %}
