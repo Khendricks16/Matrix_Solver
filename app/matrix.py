@@ -1,7 +1,10 @@
-from fractions import Fraction
+from app.matrix_html_generator import MatrixActionLogger
 
 # Used for checking if matrices are already in REF or RREF.
 from sympy import Matrix as SympyMatrix
+
+from fractions import Fraction
+
 
 
 class Matrix():
@@ -16,6 +19,10 @@ class Matrix():
         self.data = data
         self.m = dimension[0]
         self.n = dimension[1]
+
+        # Used for generating HTML content based off of different 
+        # methods performed on self.data
+        self.content_generator = MatrixActionLogger()
 
         # Used to keep track of pivot point locations while turning matrix
         # into REF through gaussian elimination. This way, when performing
@@ -34,6 +41,9 @@ class Matrix():
         """
         self.data[row_1], self.data[row_2] = self.data[row_2], self.data[row_1]
 
+        # Generate HTML content
+        self.content_generator.record_elementary_row_op(self.data, row_1, row_2)
+
     def multiply_row(self, row, constant):
         """
         Multiply a row by a nonzero constant c:
@@ -48,6 +58,9 @@ class Matrix():
                 continue
 
             self.data[row][i] = num * constant
+        
+        # Generate HTML content
+        self.content_generator.record_elementary_row_op(self.data, row, constant)
 
     def row_multiple_to_row(self, row_2, integer, row_1):
         """
@@ -57,6 +70,9 @@ class Matrix():
 
         for i, num in enumerate(self.data[row_2]):
             self.data[row_2][i] = num + (integer * self.data[row_1][i])
+        
+        # Generate HTML content
+        self.content_generator.record_elementary_row_op(self.data, row_2, integer, row_1)
 
     # Helper Methods for Gaussian Elimination
     def _eliminate_entries(self, pivot_point_location: tuple, direction: str = "below") -> None:

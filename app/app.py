@@ -5,12 +5,11 @@ from app.matrix import Matrix
 
 from fractions import Fraction
 
+
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return render_template("index.html")
 
+# Helper functions
 def is_valid_matrix_dimensions(m: str, n: str) -> bool:
     
     if not m.isnumeric() or not n.isnumeric():
@@ -58,42 +57,48 @@ def process_matrix_data(data, m, n) -> list:
     user_matrix = Matrix(user_matrix_data, (m, n))
     return user_matrix
 
-@app.route("/system-of-equations", methods=['GET', 'POST'])
-def system_of_equation():
-    # Get dimension parameters
-    m = request.args.get('m') if request.args.get('m') else str()
-    n = request.args.get('n') if request.args.get('n') else str()
+def solve_system_of_equations(matrix, m, n):
+    if request.args.get("method") == "gaussian-elimination":
+        matrix.gaussian_elimination()
 
-    # User hasn't submitted any data for matrix dimensions
-    if request.method == 'GET' and not m and not n:
-        return render_template("system-of-equations.html", dimensions=(0,0))
+    elif request.args.get("method") == "gauss-jordan-elimination":
+        matrix.gaussian_elimination(gauss_jordan=True)
 
-    # Validate Matrix Dimensions
-    if not is_valid_matrix_dimensions(m, n):
-        # Invalid dimensions
-        abort(400, description="Invalid Matrix Dimensions")
-    else:
-        # Valid dimensions
-        m, n = int(m), int(n)
+
+# Routed functions
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/system-of-equations", methods=["GET", "POST"])
+def system_of_equations():
+    if request.method == "GET":
+        return render_template("system-of-equations.html")
     
-    # User has submitted proper data for matrix dimensions
-    if request.method == 'GET':
-        return render_template("system-of-equations.html", dimensions=(m, n))
+    elif request.method == "POST":
+        # Get matrix parameters
+        m = request.args.get('m', '') 
+        n = request.args.get('n', '')
 
+        # Get augmented matrix
+        augmented_matrix = request.form
 
-    # User submitted Matrix data
-    if request.method == 'POST':
-        matrix = process_matrix_data(request.form, m, n)
-        
-        # Solve System
-        if request.args.get("method") == "gaussian-elimination":
-            matrix.gaussian_elimination()
-        elif request.args.get("method") == "gauss-jordan-elimination":
-            matrix.gaussian_elimination(gauss_jordan=True)
-        
-        # TODO: Implement updates to Row Operations section of page
+        # Handle user data
+        if not is_valid_matrix_dimensions(m, n):
+            # Invalid dimensions
+            abort(400, description="Invalid Matrix Dimensions")
+        else:
+            # Valid dimensions
+            m, n = int(m), int(n)
 
-        return render_template("system-of-equations.html", dimensions=(m, n))
+        augmented_matrix = process_matrix_data(augmented_matrix, m, n)
+
+        # Solve matrix
+        solve_system_of_equations(augmented_matrix, m, n)
+
+        return render_template("system-of-equations.html",
+                            generated_matrix_content=augmented_matrix.content_generator)
 
 
 @app.route("/how-to-solve")
