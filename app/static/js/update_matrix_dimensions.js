@@ -45,6 +45,7 @@ function addMatrixEntries(gridContainer, m, n) {
         newEntry.classList.add("grid-item", "number-entry");
         newEntry.setAttribute("type", "text");
         newEntry.setAttribute("name", `entry_${i}`);
+        newEntry.setAttribute("id", `entry_${i}`);
         newEntry.style.gridArea = `entry${i}`;
 
         gridContainer.appendChild(newEntry);

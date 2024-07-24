@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import render_template, request, abort
+from flask import render_template, request, abort, jsonify
 
 from app.matrix import Matrix
 
@@ -30,7 +30,7 @@ def is_valid_matrix_dimensions(m: str, n: str) -> bool:
         return False
     
 
-def process_matrix_data(data, m, n) -> list:
+def process_matrix_data(data: dict, m: int, n: int) -> list:
     user_matrix_data = []
     
     curr_row = []
@@ -58,10 +58,10 @@ def process_matrix_data(data, m, n) -> list:
     return user_matrix
 
 def solve_system_of_equations(matrix, m, n):
-    if request.args.get("method") == "gaussian-elimination":
+    if request.form.get("method") == "gaussian-elimination":
         matrix.gaussian_elimination()
 
-    elif request.args.get("method") == "gauss-jordan-elimination":
+    elif request.form.get("method") == "gauss-jordan-elimination":
         matrix.gaussian_elimination(gauss_jordan=True)
 
 
@@ -78,11 +78,11 @@ def system_of_equations():
     
     elif request.method == "POST":
         # Get matrix parameters
-        m = request.args.get('m', '') 
-        n = request.args.get('n', '')
+        m = request.form.get('m', '') 
+        n = request.form.get('n', '')
 
         # Get augmented matrix
-        augmented_matrix = request.form
+        augmented_matrix = dict(filter(lambda pair: pair[0].find("entry") != -1, request.form.items()))
 
         # Handle user data
         if not is_valid_matrix_dimensions(m, n):
@@ -97,8 +97,14 @@ def system_of_equations():
         # Solve matrix
         solve_system_of_equations(augmented_matrix, m, n)
 
-        return render_template("system-of-equations.html",
-                            generated_matrix_content=augmented_matrix.content_generator)
+        html_content = render_template("solved_systems_of_equations_content.html",
+                            solved_matrix=augmented_matrix)
+        matrices_content = list(i[0] for i in augmented_matrix.content_generator.row_op_content)
+        return jsonify({
+            "html": html_content,
+            "matrices": matrices_content
+        })
+
 
 
 @app.route("/how-to-solve")

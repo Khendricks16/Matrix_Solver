@@ -2,31 +2,50 @@ import inspect
 from copy import deepcopy
 
 class MatrixActionLogger():
-    def __init__(self):
+    def __init__(self, matrix):
+        """
+        Args:
+            data (list): The list representation of the matrix
+        """
+        # Reference to the Matrix.data in order to keep track of what
+        # the matrix is currently equal too.
+        self.curr_matrix = matrix
+
+        # List to track row operations performed on the matrix.
+        # Each entry:
+        # - tuple[0]: A copy of the matrix at that point in time.
+        # - tuple[1]: The row operation performed to obtain the matrix in tuple[0].
+        # Initialize with the starting matrix.
+        starting_matrix = f"""
+            <button id="row-op-0" class="row-op-btn">
+            Starting Matrix  
+            </button>
+            """
+        self.row_op_content = [(self.stringify_matrix_entries(), starting_matrix)]
+    
+
+    def stringify_matrix_entries(self) -> list:
+        """
+        Returns a deep copy of self.curr_matrix which each entry a str.
+        """
+
+        matrix_cpy = deepcopy(self.curr_matrix)
+
+        for i, row in enumerate(matrix_cpy):
+            for j, entry in enumerate(row):
+                matrix_cpy[i][j] = str(matrix_cpy[i][j])
         
-        
-        # List used for keeping track of all row operations
-        # that were performed on a given matrix.
-        # List should contain tuples of length 2 where,
-        # 
-        # tuple[0] is a copy of the matrix at that point
-        # in time.
-        # 
-        # tuple[1] is the row operation that just took
-        # to obtain the matrix at tuple[0]
-        self.row_operations = []
+        return matrix_cpy
 
 
-    def record_elementary_row_op(self, matrix: list, *args) -> None:
+    def record_elementary_row_op(self, *args) -> None:
         # Get the name of function that called
         # this method
         caller_function = inspect.stack()[1].function
 
         # Generate HTML for row operation
-        html_content = """
-            <button class="row-operations-btn">
-                {}
-            </button>
+        html_content = f"""
+            <button id="row-op-{len(self.row_op_content)}" class="row-op-btn">
             """
         
         if caller_function == "swap_rows":
@@ -52,4 +71,5 @@ class MatrixActionLogger():
             return
 
         # A valid row operation method called this function
-        self.row_operations.append((deepcopy(matrix), html_content.format(row_op_label)))
+        html_content += f"\n{row_op_label}" + "\n</button>"
+        self.row_op_content.append((self.stringify_matrix_entries(), html_content))

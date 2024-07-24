@@ -1,0 +1,5 @@
+{% if solved_matrix is defined %}
+    {% for row_op in solved_matrix.content_generator.row_op_content %}
+        {{row_op[1] | safe}}
+    {% endfor %}
+{% endif %}

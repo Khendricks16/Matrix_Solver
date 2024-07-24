@@ -25,13 +25,6 @@
     margin-left: 10px;
 }
 
-#row-operations-scroll {
-    overflow-y: auto;
-    background-color: gray;
-    border: 1px solid rgba(0, 0, 0, 0.8);
-    height: 80%;
-    
-}
 
 /* Layout */
 
@@ -53,6 +46,15 @@
     justify-content: center;
 }
 
+#row-operations-scroll {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: gray;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    height: 80%;
+    
+}
 
 /* Classes */
 .number-entry {
@@ -92,4 +94,9 @@
     width: 2px; 
     height: 80px;
     background-color: black;
+}
+
+.row-op-btn {
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
