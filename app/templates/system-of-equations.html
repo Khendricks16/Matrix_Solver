@@ -42,7 +42,7 @@
                 <div class="vertical-line" id="right-vertical-line"></div>
                 <div class="horizontal-line"></div>
             </div>
-            <input id="matrix-values-submit" type="submit" value="Enter Matrix Values">
+            <input id="matrix-values-submit" type="submit" value="Solve This Matrix">
         </form>
     </div>
 </section>
@@ -58,6 +58,6 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/toggle_radio_buttons.js') }}"></script>
 <script src="{{ url_for('static', filename='js/update_matrix_dimensions.js') }}"></script>
-<script src="{{ url_for('static', filename='js/update_matrix_grid.js') }}"></script>
+<script src="{{ url_for('static', filename='js/update_matrix_values.js') }}"></script>
 <script src="{{ url_for('static', filename='js/submit_matrix.js') }}"></script>
 {% endblock %}

@@ -13,31 +13,37 @@ function getSolvingMethod(){
     return selectedMethod;
 }
 
-async function retrieveSolvedContent(matrixForm, m, n, method){
+async function fetchSolvedContent(matrixForm, m, n, method){
     formData = new FormData(matrixForm);
     formData.append('m', m);
     formData.append('n', n);
     formData.append("method", method);
 
-    await fetch("/system-of-equations", {
+    const response = await fetch("/system-of-equations", {
         method: "POST",
         body: formData
     })
-    .then(response => response.json())
-    .then(data => {
-        htmlContent = data.html;
-        matricesContent = data.matrices;
-    });
 
-    if (htmlContent && matricesContent){
+    if (!response.ok){
+        // Invalid entries were submitted
+        return [null, null, null];
+    }
+    
+    data = await response.json()
+    rowOpContent = data.rowOperationsHTML
+    coefficientMatricesContent = data.coefficientMatrices
+    constantMatricesContent = data.constantMatrices
+
+
+    if (rowOpContent && coefficientMatricesContent && constantMatricesContent){
         // Valid entires were submitted as the
         // backend returned what was expected
-        return [htmlContent, matricesContent];
+        return [rowOpContent, coefficientMatricesContent, constantMatricesContent];
     }
-    else {
+    else {  
         // Invalid entries were submitted as the backend
         // couldn't solve the matrix
-        alert("Error, couldn't solve the matrix");
+        return [null, null, null];
     }
 }
 
@@ -59,11 +65,27 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!solvingMethod){
             event.preventDefault();
             alert("No solving method has been selected");
+
         }
         else {
             // Fetch solved data
-            let [rowOperationButtons, matrices] = await retrieveSolvedContent(matrixForm, m, n, solvingMethod);
-            
+            let [
+                rowOperationButtons, 
+                coefficientMatrices, 
+                constantMatrices
+            ] = await fetchSolvedContent(
+                matrixForm, 
+                m, 
+                n, 
+                solvingMethod
+            );
+
+            if (!rowOperationButtons || !coefficientMatrices || !constantMatrices){
+                alert("Error, could not solve matrix");
+                return;
+            }
+
+        
             const parser = new DOMParser();
 
             content = parser.parseFromString(content, "text/html");
@@ -74,9 +96,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Give each button the ability to update matrix grid
             // when pressed
-            for (let i = 0; i < matrices.length; i++){
+            for (let i = 0; i < coefficientMatrices.length; i++){
                 document.getElementById(`row-op-${i}`).addEventListener("click", function (){
-                    updateMatrixGrid(matrices[i]);
+                    updateMatrixValues(coefficientMatrices[i], constantMatrices[i]);
                 })
                 
             }

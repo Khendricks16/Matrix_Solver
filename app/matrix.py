@@ -40,7 +40,7 @@ class Matrix():
         R_1 <-> R_2
         """
         self.data[row_1], self.data[row_2] = self.data[row_2], self.data[row_1]
-
+        
         # Generate HTML content
         self.content_generator.record_elementary_row_op(row_1, row_2)
 
@@ -52,12 +52,12 @@ class Matrix():
         if constant == 0:
             return
 
-        for i, num in enumerate(self.data[row]):
+        for i in range(len(self.data[row])):
             # Avoid -0.0 instances
-            if num == 0:
+            if self.data[row][i] == 0:
                 continue
 
-            self.data[row][i] = num * constant
+            self.data[row][i] *= constant
         
         # Generate HTML content
         self.content_generator.record_elementary_row_op(row, constant)
@@ -68,8 +68,8 @@ class Matrix():
         R_2:= R_2 + (integer)*R_1
         """
 
-        for i, num in enumerate(self.data[row_2]):
-            self.data[row_2][i] = num + (integer * self.data[row_1][i])
+        for i in range(len(self.data[row_2])):
+            self.data[row_2][i] += (integer * self.data[row_1][i])
         
         # Generate HTML content
         self.content_generator.record_elementary_row_op(row_2, integer, row_1)
@@ -241,7 +241,7 @@ class Matrix():
                     self.gaussian_elimination(pivots_normalized=pivots_normalized + 1, gauss_jordan=gauss_jordan)
                     return
 
-                elif curr_row != pivots_normalized and row[curr_column] == -1:
+                elif row[curr_column] == -1 and row_with_neg_one[0] == False:
                     # Don't perform the swap operation in case there
                     # is another entry within the pivot column that is already
                     # 1 to save a self.multiply_row(X, -1) operation.
@@ -262,7 +262,10 @@ class Matrix():
             # so swap rows, multiply row by -1, and continue to next pivot.
             if row_with_neg_one[0]:
                 self.multiply_row(row_with_neg_one[1], -1)
-                self.swap_rows(pivots_normalized, row_with_neg_one[1])
+                
+                # Swap rows if needed
+                if pivots_normalized != row_with_neg_one[1]:
+                    self.swap_rows(pivots_normalized, row_with_neg_one[1])
 
                 # Current pivot is normalized, so eliminate entries below it
                 self._eliminate_entries(pivot_point_location=(pivots_normalized,curr_column), direction="below")
@@ -299,3 +302,46 @@ class Matrix():
             # Continue to next pivot
             self.gaussian_elimination(pivots_normalized=pivots_normalized + 1, gauss_jordan=gauss_jordan)
             return
+
+
+class AugmentedMatrix(Matrix):
+    def __init__(self, coefficient_matrix: list, constant_matrix: list, dimension: tuple):
+        """
+        Args:
+            coefficient_matrix (list): The list representation of
+                        the coefficient matrix.
+            constant_matrix (list): The list representation of
+                        the constant matrix.
+            dimension (tuple): Contains the m by n dimensions for 
+                        the whole augmented matrix (coefficient matrix +
+                        constant matrix in the form of (m, n).
+        """
+        # Treat coefficient_matrix like Matrix.data
+        super().__init__(coefficient_matrix, dimension=(dimension[0], dimension[1] - 1))
+
+        self.constant_matrix = constant_matrix
+
+        # Used for generating HTML content based off of different 
+        # methods performed on self.data
+        self.content_generator = MatrixActionLogger(self.data, constant_matrix=self.constant_matrix)
+    
+    def swap_rows(self, row_1, row_2):
+        # Perform row operation constant matrix
+        self.constant_matrix[row_1], self.constant_matrix[row_2] = (
+            self.constant_matrix[row_2],
+            self.constant_matrix[row_1]
+        )
+
+        super().swap_rows(row_1, row_2)
+    
+    def multiply_row(self, row, constant):
+        # Perform row operation constant matrix
+        self.constant_matrix[row][0] *= constant
+        
+        super().multiply_row(row, constant)
+    
+    def row_multiple_to_row(self, row_2, integer, row_1):
+        # Perform row operation constant matrix
+        self.constant_matrix[row_2][0] += (integer * self.constant_matrix[row_1][0])
+        
+        super().row_multiple_to_row(row_2, integer, row_1)

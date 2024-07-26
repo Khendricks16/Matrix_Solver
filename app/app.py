@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template, request, abort, jsonify
 
-from app.matrix import Matrix
+from app.matrix import Matrix, AugmentedMatrix
 
 from fractions import Fraction
 
@@ -32,37 +32,56 @@ def is_valid_matrix_dimensions(m: str, n: str) -> bool:
 
 def process_matrix_data(data: dict, m: int, n: int) -> list:
     user_matrix_data = []
-    
     curr_row = []
-    for i, entry in enumerate(data):
-        try:
-            if i % n == 0:
-                # Start of a new row
-                if curr_row:
-                    user_matrix_data.append(curr_row)
+    
+    try:
+        for i, entry in enumerate(data):
+            # End of row has been reached, start a new row.
+            if (i + 1) % n == 0:
+                curr_row.append(Fraction(data[entry]))
+                user_matrix_data.append(curr_row)
                 
                 curr_row = []
+                
+            else:
+                curr_row.append(Fraction(data[entry]))
 
-            curr_row.append(Fraction(data[entry]))
-    
-
-        except ValueError:
+    except ValueError:
         # Invalid Entry
-            abort(400, description="Invalid Matrix Values")
+        abort(400, description="Invalid Matrix Values")
 
-    # End of loop, account for very last row as well
-    user_matrix_data.append(curr_row)
+    # Something went wrong as there are not as many rows
+    # as there should be
+    if len(user_matrix_data) != m:
+        abort(400, description="Invalid Matrix Values")
+    
+    return user_matrix_data
+
+def process_constant_matrix_data(data: dict, m: int) -> list:
+    user_matrix_data = []
+
+    try:
+        for entry in data:
+            user_matrix_data.append([Fraction(data[entry])])
+
+    except ValueError:
+        # Invalid Entry
+        abort(400, description="Invalid Matrix Values")
+    
+    if len(user_matrix_data) != m:
+        abort(400, description="Invalid Matrix Values")
+    
+    return user_matrix_data
 
 
-    user_matrix = Matrix(user_matrix_data, (m, n))
-    return user_matrix
-
-def solve_system_of_equations(matrix, m, n):
+def solve_system_of_equations(matrix):
     if request.form.get("method") == "gaussian-elimination":
         matrix.gaussian_elimination()
 
     elif request.form.get("method") == "gauss-jordan-elimination":
         matrix.gaussian_elimination(gauss_jordan=True)
+    else:
+        abort(400, description="Invalid solving method")
 
 
 # Routed functions
@@ -77,14 +96,16 @@ def system_of_equations():
         return render_template("system-of-equations.html")
     
     elif request.method == "POST":
-        # Get matrix parameters
+        # Get full augmented matrix dimension parameters
         m = request.form.get('m', '') 
         n = request.form.get('n', '')
 
-        # Get augmented matrix
-        augmented_matrix = dict(filter(lambda pair: pair[0].find("entry") != -1, request.form.items()))
+        # Get augmented matrix data
+        coefficient_matrix_data = dict(filter(lambda pair: pair[0].find("entry") != -1, request.form.items()))
+        constant_matrix_data = dict(filter(lambda pair: pair[0].find("constantEntry") != -1, request.form.items()))
 
-        # Handle user data
+
+        # Process user data
         if not is_valid_matrix_dimensions(m, n):
             # Invalid dimensions
             abort(400, description="Invalid Matrix Dimensions")
@@ -92,17 +113,27 @@ def system_of_equations():
             # Valid dimensions
             m, n = int(m), int(n)
 
-        augmented_matrix = process_matrix_data(augmented_matrix, m, n)
+        
+        coefficient_matrix = process_matrix_data(coefficient_matrix_data, m, n - 1)
+        constant_matrix = process_constant_matrix_data(constant_matrix_data, m)
+
+        # Define matrix from validated user data
+        augmented_matrix = AugmentedMatrix(coefficient_matrix, constant_matrix, dimension=(m, n))
+
 
         # Solve matrix
-        solve_system_of_equations(augmented_matrix, m, n)
+        solve_system_of_equations(augmented_matrix)
 
-        html_content = render_template("solved_systems_of_equations_content.html",
+        # Return solved data
+        row_operations_html = render_template("solved_systems_of_equations_content.html",
                             solved_matrix=augmented_matrix)
-        matrices_content = list(i[0] for i in augmented_matrix.content_generator.row_op_content)
+        coefficient_matrices = list(i[1] for i in augmented_matrix.content_generator.row_op_content)
+        constant_matrices = list(i[2] for i in augmented_matrix.content_generator.row_op_content)
+
         return jsonify({
-            "html": html_content,
-            "matrices": matrices_content
+            "rowOperationsHTML": row_operations_html,
+            "coefficientMatrices": coefficient_matrices,
+            "constantMatrices": constant_matrices
         })
 
 

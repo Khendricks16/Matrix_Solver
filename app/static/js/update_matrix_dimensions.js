@@ -40,12 +40,26 @@ function setUpGridTemplateArea(gridContainer, m, n) {
 
 
 function addMatrixEntries(gridContainer, m, n) {
+    let coeffEntry = 0;
+    let constEntry = 0;
     for (i = 0; i < m * n; i++){
         let newEntry = document.createElement("input");
         newEntry.classList.add("grid-item", "number-entry");
         newEntry.setAttribute("type", "text");
-        newEntry.setAttribute("name", `entry_${i}`);
-        newEntry.setAttribute("id", `entry_${i}`);
+        
+        // Constant entries
+        if ((i + 1) % n == 0 ){
+            newEntry.setAttribute("name", `constantEntry_${constEntry}`);
+            newEntry.setAttribute("id", `constantEntry_${constEntry}`); 
+            constEntry++;
+        }
+        // Coefficient entries
+        else{
+            newEntry.setAttribute("name", `entry_${coeffEntry}`);
+            newEntry.setAttribute("id", `entry_${coeffEntry}`); 
+            coeffEntry++;
+        }
+
         newEntry.style.gridArea = `entry${i}`;
 
         gridContainer.appendChild(newEntry);
