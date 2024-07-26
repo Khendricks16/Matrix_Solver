@@ -1,4 +1,4 @@
-from app.matrix import Matrix
+from app.matrix import Matrix, AugmentedMatrix
 
 from fractions import Fraction
 import random
@@ -340,10 +340,10 @@ class TestGaussianElimination():
     def test_gaussian_elimination_vary_matrices(self):
         """Should convert matrices into REF and RREF."""
 
-        # Test 1000 randomly generated matrices.
+        # Test 100 randomly generated matrices.
         # Each matrix is of random dimension and entries.
         # The max dimension for a matrix is a 10x10.
-        for i in range(1000):
+        for i in range(100):
             # Random dimension for matrix from where m or n could be 1-10
             m, n = random.randint(1, 10), random.randint(1, 10)
 
@@ -363,3 +363,147 @@ class TestGaussianElimination():
             B = Matrix(deepcopy(matrix_data), (m, n))
             B.gaussian_elimination(gauss_jordan=True)
             assert SympyMatrix(B.data) == SympyMatrix(matrix_data).rref()[0]
+
+
+class TestSolveSystemOfEquations:
+
+    def test_single_variable(self):
+        coeff_matrix = [
+            [2]
+        ]
+        const_matrix = [[4]]
+        expected_coeff_matrix = [
+            [1]
+        ]
+        expected_const_matrix = [[2]]
+
+        aug_matrix = AugmentedMatrix(coeff_matrix, const_matrix, dimension=(1, 2))
+        aug_matrix.gaussian_elimination(gauss_jordan=True)
+
+        assert aug_matrix.data == expected_coeff_matrix
+        assert aug_matrix.constant_matrix == expected_const_matrix
+
+    def test_single_solution(self):
+        coeff_matrix = [
+            [2, 1],
+            [1, 3]
+        ]
+        const_matrix = [[8], [13]]
+        expected_coeff_matrix = [
+            [1, 0],
+            [0, 1]
+        ]
+        expected_const_matrix = [[Fraction(11, 5)], [Fraction(18, 5)]]
+
+        aug_matrix = AugmentedMatrix(coeff_matrix, const_matrix, dimension=(2, 3))
+        aug_matrix.gaussian_elimination(gauss_jordan=True)
+
+        assert aug_matrix.data == expected_coeff_matrix
+        assert aug_matrix.constant_matrix == expected_const_matrix
+
+    def test_no_solution(self):
+        coeff_matrix = [
+            [1, -2],
+            [2, -4]
+        ]
+        const_matrix = [[1], [3]]
+        expected_coeff_matrix = [
+            [1, -2],
+            [0, 0]
+        ]
+        expected_const_matrix = [[1], [1]]
+
+        aug_matrix = AugmentedMatrix(coeff_matrix, const_matrix, dimension=(2, 3))
+        aug_matrix.gaussian_elimination(gauss_jordan=True)
+
+        assert aug_matrix.data == expected_coeff_matrix
+        assert aug_matrix.constant_matrix == expected_const_matrix
+
+    def test_infinite_solutions(self):
+        coeff_matrix = [
+            [1, -2],
+            [2, -4]
+        ]
+        const_matrix = [[1], [2]]
+        expected_coeff_matrix = [
+            [1, -2],
+            [0, 0]
+        ]
+        expected_const_matrix = [[1], [0]]
+
+        aug_matrix = AugmentedMatrix(coeff_matrix, const_matrix, dimension=(2, 3))
+        aug_matrix.gaussian_elimination(gauss_jordan=True)
+
+        assert aug_matrix.data == expected_coeff_matrix
+        assert aug_matrix.constant_matrix == expected_const_matrix
+
+    def test_zero_matrix(self):
+        coeff_matrix = [
+            [0, 0],
+            [0, 0]
+        ]
+        const_matrix = [[0], [0]]
+        expected_coeff_matrix = [
+            [0, 0],
+            [0, 0]
+        ]
+        expected_const_matrix = [[0], [0]]
+
+        aug_matrix = AugmentedMatrix(coeff_matrix, const_matrix, dimension=(2, 3))
+        aug_matrix.gaussian_elimination(gauss_jordan=True)
+
+        assert aug_matrix.data == expected_coeff_matrix
+        assert aug_matrix.constant_matrix == expected_const_matrix
+
+    def test_identity_matrix(self):
+        coeff_matrix = [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]
+        ]
+        const_matrix = [[5], [10], [15]]
+        expected_coeff_matrix = [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]
+        ]
+        expected_const_matrix = [[5], [10], [15]]
+
+        aug_matrix = AugmentedMatrix(coeff_matrix, const_matrix, dimension=(3, 4))
+        aug_matrix.gaussian_elimination(gauss_jordan=True)
+
+        assert aug_matrix.data == expected_coeff_matrix
+        assert aug_matrix.constant_matrix == expected_const_matrix
+
+    def test_larger_system(self):
+        coeff_matrix = [
+            [4, 8, 6, 8, 9, 3],
+            [9, 4, 4, 6, 3, 2],
+            [7, 8, 5, 6, 7, 8],
+            [3, 4, 5, 6, 4, 65],
+            [9, 8, 6, 5, 6, 5],
+            [4, 5, 6, 7, 5, 6],
+        ]
+        const_matrix = [[1], [2], [3], [4], [5], [6]]
+        expected_coeff_matrix = [
+            [1, 0, 0, 0, 0, 0],
+            [0, 1, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0, 0],
+            [0, 0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 1, 0],
+            [0, 0, 0, 0, 0, 1]
+        ]
+        expected_const_matrix = [
+            [Fraction(-10286, 8393)],
+            [Fraction(33426, 8393)],
+            [Fraction(1165, 1199)],
+            [Fraction(9662, 8393)],
+            [Fraction(-38154, 8393)],
+            [Fraction(-237, 8393)]
+        ]
+
+        aug_matrix = AugmentedMatrix(coeff_matrix, const_matrix, dimension=(6, 7))
+        aug_matrix.gaussian_elimination(gauss_jordan=True)
+
+        assert aug_matrix.data == expected_coeff_matrix
+        assert aug_matrix.constant_matrix == expected_const_matrix

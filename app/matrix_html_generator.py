@@ -1,6 +1,7 @@
 import inspect
 from copy import deepcopy
 
+
 class MatrixActionLogger():
     def __init__(self, matrix, constant_matrix=None):
         """
@@ -18,25 +19,23 @@ class MatrixActionLogger():
         # track of what it is currently equal too.
         self.curr_constant_matrix = constant_matrix
 
-
         # List to track row operations performed on the matrix.
         # Each entry:
         # - tuple[0]: The row operation performed on the previous matrix
         #       to obtain the matrix in tuple[1] and subsequently in tuple[2].
         # - tuple[1]: A copy of the matrix at that point in time.
         # - tuple[2]: A copy of the constant matrix at that point in time.
-        
+
         # Initialize with the starting matrix.
         self.row_op_content = []
 
         # Add starting matrix content
-        starting_matrix_content = f"""
+        starting_matrix_content = """
             <button id="row-op-0" class="row-op-btn">
-            Starting Matrix  
+            Starting Matrix
             </button>
             """
         self.update_row_op_content(starting_matrix_content)
-    
 
     def stringify_matrix_entries(self, matrix: list) -> list:
         """
@@ -48,9 +47,8 @@ class MatrixActionLogger():
         for i, row in enumerate(matrix_cpy):
             for j, entry in enumerate(row):
                 matrix_cpy[i][j] = str(entry)
-        
+
         return matrix_cpy
-    
 
     def update_row_op_content(self, content) -> None:
         """Adds passed content to self.row_op_content"""
@@ -58,13 +56,12 @@ class MatrixActionLogger():
             self.row_op_content.append((content,
                                         self.stringify_matrix_entries(self.curr_matrix),
                                         self.stringify_matrix_entries(self.curr_constant_matrix),
-                                    ))
+                                        ))
         else:
             self.row_op_content.append((content,
                                         self.stringify_matrix_entries(self.curr_matrix),
                                         None
-                                    ))
-
+                                        ))
 
     def record_elementary_row_op(self, *args) -> None:
         # Get the name of function that called
@@ -75,7 +72,7 @@ class MatrixActionLogger():
         html_content = f"""
             <button id="row-op-{len(self.row_op_content)}" class="row-op-btn">
             """
-        
+
         if caller_function == "swap_rows":
             row_op_label = f"R<sub>{args[0] + 1}</sub> &larr;&rarr; R<sub>{args[1] + 1}</sub>"
         elif caller_function == "multiply_row":
@@ -90,7 +87,7 @@ class MatrixActionLogger():
             # The constant is a fraction
             if str(args[1]).find("/") != -1:
                 fraction = f"<sup>{args[1].numerator}</sup>&frasl;<sub>{args[1].denominator}</sub>"
-                row_op_label = f"R<sub>{args[0] + 1}</sub> + {fraction}R<sub>{args[2] + 1}</sub> &rarr; R<sub>{args[0] + 1}</sub>"                
+                row_op_label = f"R<sub>{args[0] + 1}</sub> + {fraction}R<sub>{args[2] + 1}</sub> &rarr; R<sub>{args[0] + 1}</sub>"
             # The constant is a whole number
             else:
                 row_op_label = f"R<sub>{args[0] + 1}</sub> + {str(args[1])}R<sub>{args[2] + 1}</sub> &rarr; R<sub>{args[0] + 1}</sub>"

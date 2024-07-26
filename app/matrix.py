@@ -6,7 +6,6 @@ from sympy import Matrix as SympyMatrix
 from fractions import Fraction
 
 
-
 class Matrix():
     def __init__(self, data: list, dimension: tuple):
         """
@@ -20,7 +19,7 @@ class Matrix():
         self.m = dimension[0]
         self.n = dimension[1]
 
-        # Used for generating HTML content based off of different 
+        # Used for generating HTML content based off of different
         # methods performed on self.data
         self.content_generator = MatrixActionLogger(self.data)
 
@@ -40,7 +39,7 @@ class Matrix():
         R_1 <-> R_2
         """
         self.data[row_1], self.data[row_2] = self.data[row_2], self.data[row_1]
-        
+
         # Generate HTML content
         self.content_generator.record_elementary_row_op(row_1, row_2)
 
@@ -58,7 +57,7 @@ class Matrix():
                 continue
 
             self.data[row][i] *= constant
-        
+
         # Generate HTML content
         self.content_generator.record_elementary_row_op(row, constant)
 
@@ -70,7 +69,7 @@ class Matrix():
 
         for i in range(len(self.data[row_2])):
             self.data[row_2][i] += (integer * self.data[row_1][i])
-        
+
         # Generate HTML content
         self.content_generator.record_elementary_row_op(row_2, integer, row_1)
 
@@ -187,7 +186,7 @@ class Matrix():
                 if self.data[pivots_normalized][curr_column] == 1:
                     # Current pivot is normalized,
                     # so eliminate entries below it
-                    self._eliminate_entries(pivot_point_location=(pivots_normalized,curr_column), direction="below")
+                    self._eliminate_entries(pivot_point_location=(pivots_normalized, curr_column), direction="below")
 
                     # Keep track of pivot point location
                     self._pivot_point_locations[pivots_normalized] = (pivots_normalized, curr_column)
@@ -232,7 +231,7 @@ class Matrix():
 
                     # Current pivot is normalized,
                     # so eliminate entries below it
-                    self._eliminate_entries(pivot_point_location=(pivots_normalized,curr_column), direction="below")
+                    self._eliminate_entries(pivot_point_location=(pivots_normalized, curr_column), direction="below")
 
                     # Keep track of pivot point location
                     self._pivot_point_locations[pivots_normalized] = (pivots_normalized, curr_column)
@@ -241,7 +240,7 @@ class Matrix():
                     self.gaussian_elimination(pivots_normalized=pivots_normalized + 1, gauss_jordan=gauss_jordan)
                     return
 
-                elif row[curr_column] == -1 and row_with_neg_one[0] == False:
+                elif row[curr_column] == -1 and row_with_neg_one[0] is False:
                     # Don't perform the swap operation in case there
                     # is another entry within the pivot column that is already
                     # 1 to save a self.multiply_row(X, -1) operation.
@@ -262,13 +261,13 @@ class Matrix():
             # so swap rows, multiply row by -1, and continue to next pivot.
             if row_with_neg_one[0]:
                 self.multiply_row(row_with_neg_one[1], -1)
-                
+
                 # Swap rows if needed
                 if pivots_normalized != row_with_neg_one[1]:
                     self.swap_rows(pivots_normalized, row_with_neg_one[1])
 
                 # Current pivot is normalized, so eliminate entries below it
-                self._eliminate_entries(pivot_point_location=(pivots_normalized,curr_column), direction="below")
+                self._eliminate_entries(pivot_point_location=(pivots_normalized, curr_column), direction="below")
 
                 # Keep track of pivot point location
                 self._pivot_point_locations[pivots_normalized] = (pivots_normalized, curr_column)
@@ -294,7 +293,7 @@ class Matrix():
                 self.swap_rows(pivots_normalized, largest_whole_num_row[0])
 
             # Current pivot is normalized, so eliminate entries below it
-            self._eliminate_entries(pivot_point_location=(pivots_normalized,curr_column), direction="below")
+            self._eliminate_entries(pivot_point_location=(pivots_normalized, curr_column), direction="below")
 
             # Keep track of pivot point location
             self._pivot_point_locations[pivots_normalized] = (pivots_normalized, curr_column)
@@ -312,7 +311,7 @@ class AugmentedMatrix(Matrix):
                         the coefficient matrix.
             constant_matrix (list): The list representation of
                         the constant matrix.
-            dimension (tuple): Contains the m by n dimensions for 
+            dimension (tuple): Contains the m by n dimensions for
                         the whole augmented matrix (coefficient matrix +
                         constant matrix in the form of (m, n).
         """
@@ -321,10 +320,10 @@ class AugmentedMatrix(Matrix):
 
         self.constant_matrix = constant_matrix
 
-        # Used for generating HTML content based off of different 
+        # Used for generating HTML content based off of different
         # methods performed on self.data
         self.content_generator = MatrixActionLogger(self.data, constant_matrix=self.constant_matrix)
-    
+
     def swap_rows(self, row_1, row_2):
         # Perform row operation constant matrix
         self.constant_matrix[row_1], self.constant_matrix[row_2] = (
@@ -333,15 +332,15 @@ class AugmentedMatrix(Matrix):
         )
 
         super().swap_rows(row_1, row_2)
-    
+
     def multiply_row(self, row, constant):
         # Perform row operation constant matrix
         self.constant_matrix[row][0] *= constant
-        
+
         super().multiply_row(row, constant)
-    
+
     def row_multiple_to_row(self, row_2, integer, row_1):
         # Perform row operation constant matrix
         self.constant_matrix[row_2][0] += (integer * self.constant_matrix[row_1][0])
-        
+
         super().row_multiple_to_row(row_2, integer, row_1)
