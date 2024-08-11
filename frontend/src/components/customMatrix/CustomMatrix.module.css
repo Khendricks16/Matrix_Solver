@@ -1,0 +1,71 @@
+/* Dimension form */
+.dimension-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px;
+}
+
+.dimension-entry {
+    text-align: left;
+}
+
+/* Matrix form layout */
+.matrix-form {
+    display: grid;
+    grid-template-areas:
+        "left-bracket entries right-bracket"
+        "submit submit submit";
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+    align-items: center;
+    max-width: 100%;
+}
+
+/* Matrix brackets */
+.left-matrix-bracket, .right-matrix-bracket {
+    display: flex;
+    flex-direction: column;
+}
+
+.left-matrix-bracket {
+    grid-area: left-bracket;
+    align-items: flex-start;
+}
+
+.right-matrix-bracket {
+    grid-area: right-bracket;
+    align-items: flex-end;
+}
+
+.vertical-line {
+    width: 2px; 
+    height: 80px;
+    background-color: black;
+}
+
+.horizontal-line {
+    width: 20px;
+    height: 2px;    
+    background-color: black;
+}
+
+/* Matrix entries */
+.matrix-entries {
+    grid-area: entries;
+    
+    display: grid;
+    gap: 5px;
+    justify-content: center; 
+    align-content: center;
+}
+
+
+
+/* Matrix submit button */
+.matrix-values-submit {
+    grid-area: submit;
+    width: 115px;
+    align-self: center;
+    justify-self: center;
+}

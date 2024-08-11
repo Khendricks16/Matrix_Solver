@@ -1,4 +1,4 @@
-from app.matrix_html_generator import MatrixActionLogger
+from backend.matrix_action_logger import MatrixActionLogger
 
 # Used for checking if matrices are already in REF or RREF.
 from sympy import Matrix as SympyMatrix
@@ -19,9 +19,8 @@ class Matrix():
         self.m = dimension[0]
         self.n = dimension[1]
 
-        # Used for generating HTML content based off of different
-        # methods performed on self.data
-        self.content_generator = MatrixActionLogger(self.data)
+        # Set action logger
+        self.action_logger = MatrixActionLogger(self.data)
 
         # Used to keep track of pivot point locations while turning matrix
         # into REF through gaussian elimination. This way, when performing
@@ -40,8 +39,8 @@ class Matrix():
         """
         self.data[row_1], self.data[row_2] = self.data[row_2], self.data[row_1]
 
-        # Generate HTML content
-        self.content_generator.record_elementary_row_op(row_1, row_2)
+        # Log action
+        self.action_logger.record_elementary_row_op(row_1, row_2)
 
     def multiply_row(self, row, constant):
         """
@@ -58,20 +57,20 @@ class Matrix():
 
             self.data[row][i] *= constant
 
-        # Generate HTML content
-        self.content_generator.record_elementary_row_op(row, constant)
+        # Log action
+        self.action_logger.record_elementary_row_op(row, constant)
 
-    def row_multiple_to_row(self, row_2, integer, row_1):
+    def row_multiple_to_row(self, row_2, scalar, row_1):
         """
         Add a multiple of a row to another row:
-        R_2:= R_2 + (integer)*R_1
+        R_2:= R_2 + (scalar)*R_1
         """
 
         for i in range(len(self.data[row_2])):
-            self.data[row_2][i] += (integer * self.data[row_1][i])
+            self.data[row_2][i] += (scalar * self.data[row_1][i])
 
-        # Generate HTML content
-        self.content_generator.record_elementary_row_op(row_2, integer, row_1)
+        # Log action
+        self.action_logger.record_elementary_row_op(row_2, scalar, row_1)
 
     # Helper Methods for Gaussian Elimination
     def _eliminate_entries(self, pivot_point_location: tuple, direction: str = "below") -> None:
@@ -322,7 +321,7 @@ class AugmentedMatrix(Matrix):
 
         # Used for generating HTML content based off of different
         # methods performed on self.data
-        self.content_generator = MatrixActionLogger(self.data, constant_matrix=self.constant_matrix)
+        self.action_logger = MatrixActionLogger(self.data, parent_constant_matrix=self.constant_matrix)
 
     def swap_rows(self, row_1, row_2):
         # Perform row operation constant matrix

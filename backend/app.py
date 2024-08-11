@@ -1,12 +1,12 @@
 from flask import Flask
-from flask import render_template, request, abort, jsonify
+from flask import request, abort, jsonify, send_from_directory
 
-from app.matrix import AugmentedMatrix
+from backend.matrix import AugmentedMatrix
 
 from fractions import Fraction
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../frontend/dist", static_url_path='')
 
 
 # Helper functions
@@ -88,15 +88,12 @@ def solve_system_of_equations(matrix):
 # Routed functions
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return send_from_directory(app.static_folder, "index.html")
 
 
-@app.route("/system-of-equations", methods=["GET", "POST"])
+@app.route("/system-of-equations", methods=["POST"])
 def system_of_equations():
-    if request.method == "GET":
-        return render_template("system-of-equations.html")
-
-    elif request.method == "POST":
+    if request.method == "POST":
         # Get full augmented matrix dimension parameters
         m = request.form.get('m', '')
         n = request.form.get('n', '')
@@ -104,7 +101,6 @@ def system_of_equations():
         # Get augmented matrix data
         coefficient_matrix_data = dict(filter(lambda pair: pair[0].find("entry") != -1, request.form.items()))
         constant_matrix_data = dict(filter(lambda pair: pair[0].find("constantEntry") != -1, request.form.items()))
-
 
         # Process user data
         if not is_valid_matrix_dimensions(m, n):
@@ -124,18 +120,8 @@ def system_of_equations():
         solve_system_of_equations(augmented_matrix)
 
         # Return solved data
-        row_operations_html = render_template("solved_systems_of_equations_content.html",
-                                              solved_matrix=augmented_matrix)
-        coefficient_matrices = list(i[1] for i in augmented_matrix.content_generator.row_op_content)
-        constant_matrices = list(i[2] for i in augmented_matrix.content_generator.row_op_content)
+        row_ops_content = augmented_matrix.action_logger.row_ops_content
 
         return jsonify({
-            "rowOperationsHTML": row_operations_html,
-            "coefficientMatrices": coefficient_matrices,
-            "constantMatrices": constant_matrices
+            "rowOperationsContent": row_ops_content
         })
-
-
-@app.route("/how-to-solve")
-def how_to_solve():
-    return render_template("how_to_solve.html")

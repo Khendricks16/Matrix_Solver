@@ -1,0 +1,81 @@
+/* Wrapper for all Sections */
+.content {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+
+    align-items: stretch;
+    height: 80vh;
+    max-width: 100%;
+
+    background-color: #6C757D;
+
+}
+
+    /* Default order */
+.content-section:nth-child(1) { order: 1; }
+.content-section:nth-child(2) { order: 2; }
+.content-section:nth-child(3) { order: 3; }
+
+@media (max-width: 1000px){
+    .content{
+        grid-template-columns: auto;
+        grid-template-rows: auto auto;
+    }
+
+    .content-section:nth-child(1) { order: 2; }
+    .content-section:nth-child(2) { order: 1; }
+    .content-section:nth-child(3) { order: 3; }
+
+}
+
+
+/* Solving Methods Section */
+.solving-methods {
+    margin-left: 50px;
+}
+
+.solving-methods-form {
+    display: flex;
+    flex-direction: column;
+
+    text-align: left;
+    margin-top: 30px;
+}
+
+.clear-selection-btn {
+    width: 105px;
+    margin-top: 10px;
+}
+
+/* Matrix Content Section */
+.matrix-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Row Operations Content Section */
+.row-operations {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 50px;
+}
+
+.row-operations-scroll {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background-color: gray;
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    height: 80%;
+    width: 150px;
+}
+
+.row-op-btn {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
