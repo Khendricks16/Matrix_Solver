@@ -16,7 +16,7 @@ import styles from "./CustomMatrix.module.css";
  *  the matrix must be done on corresponding page
  *  itself.
  */
-function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
+function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission, ...submissionData }){
     // State management for component: 
     // - userDimensions: The dimensions typed by user.
     // - dimensions: The validated dimensions used for matrix.
@@ -28,7 +28,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
     //      entries in the matrix.
 
 
-    const [userDimensions, setUserDimensions] = useState({ m: 0, n: 0});
+    const [userDimensions, setUserDimensions] = useState({ m: 0, n: 0, resetEntriesOnChange: true});
     const [dimensions, setDimensions] = useState({ m: 1, n: 1, resetEntriesOnChange: true});
     
     const [showAugLine, setShowAugLine] = useState(false);
@@ -40,8 +40,9 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
     // Handle input for matrix dimensions from user
     const handleChange = (e) => {
         // Keep any changes stored in state
-        setUserDimensions(prevDimension => (
-                {...prevDimension, [e.target.name]: Number(e.target.value)}
+        const newValue = e.target.value ? Number(e.target.value) : ""
+        setUserDimensions(prevOtherDimension => (
+                {...prevOtherDimension, [e.target.name]: newValue, resetEntriesOnChange: true}
             ))
     }
 
@@ -50,7 +51,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
     useEffect(() => {
         if (isValidDimensions(userDimensions['m'], userDimensions['n'])){
             // Validated userDimensions
-            setDimensions({...userDimensions, resetEntriesOnChange: true});
+            setDimensions(userDimensions);
         }
         else {
             // Set up Matrix to display the "Invalid Dimensions" in
@@ -106,7 +107,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
 
 
     let verticalLineHeight = {
-        height: `calc(${dimensions['m']} * 30px)`
+        height: `calc(${dimensions['m']} * 35px)`
     }
 
     // Default vertical line height
@@ -123,6 +124,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
             <input 
                 type="number"
                 name="m"
+                value={userDimensions["m"]}
                 onChange={handleChange}
                 min="0"
                 max="10"
@@ -133,6 +135,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
             <input 
                 type="number"
                 name="n"
+                value={userDimensions["n"]}
                 onChange={handleChange}
                 min="0"
                 max="10"
@@ -146,7 +149,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
             onSubmit={async (e) => {
                 const matrixStateData = {
                     setEntryValues,
-                    setDimensions,
+                    setUserDimensions,
                     ...dimensions
                 }
                 // Always expect your onSubmission function to be called with
@@ -155,6 +158,15 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
             } 
             className={styles["matrix-form"]}   
         >
+            <div className={styles["row-labels"]}>
+            {showRowLabels && isValidDimensions(userDimensions['m'], userDimensions['n']) ? (
+                entryValues.matrix.map((_, rowNum) => {
+                    return <label key={rowNum}>R<sub>{rowNum + 1}</sub></label>;
+                })
+            ): null}
+                
+                
+            </div>
             <div className={styles["left-matrix-bracket"]}>
                 <div className={styles["horizontal-line"]} />
                 <div className={styles["vertical-line"]} style={verticalLineHeight}/>
@@ -177,15 +189,42 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
                 <div className={styles["vertical-line"]} style={verticalLineHeight}/>
                 <div className={styles["horizontal-line"]} />
             </div>
-            <input className={styles["matrix-values-submit"]} type="submit" value="Solve This Matrix" />
+            <div style={{gridArea: "matrix-btns"}}>
+                <button 
+                    className={styles["matrix-control-button"]} 
+                    type="button" 
+                    onClick={() => {
+                    setUserDimensions({m: 0, n: 0});
+                }}
+                >
+                    Clear Matrix
+                </button>
+                <button 
+                    className={styles["matrix-control-button"]} 
+                    type="button" 
+                    onClick={() => {
+                    setDimensions({m: dimensions["m"], n: dimensions["n"], resetEntriesOnChange: true});
+                }}
+                >
+                    Clear Entries
+                </button>
+
+                <input 
+                    className={styles["matrix-control-button"]}
+                    type="submit"
+                    value="Solve This Matrix" 
+                />
+            </div>
+            
         </form>
         </>
     )
 }
 
 CustomMatrix.propTypes = {
-    onSubmission: PropTypes.func,
     isAugmented: PropTypes.bool,
+    showRowLabels: PropTypes.bool,
+    onSubmission: PropTypes.func,
     submissionData: PropTypes.object,
 }
 

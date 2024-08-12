@@ -49,7 +49,7 @@ export async function submitData(e, matrixStateData, submissionData){
             rowOpsContent,
             submissionData["setRowOperationsContent"],
             matrixStateData["setEntryValues"],
-            matrixStateData["setDimensions"],
+            matrixStateData["setUserDimensions"],
             matrixStateData["m"],
             matrixStateData["n"],
         );
@@ -57,7 +57,7 @@ export async function submitData(e, matrixStateData, submissionData){
   
 }
 
-function updateRowOperationsContent(content, setRowOperationsContent, setEntryValues, setDimensions, m, n){
+function updateRowOperationsContent(content, setRowOperationsContent, setEntryValues, setUserDimensions, m, n){
     // Loops through content, and creates buttons for users to
     // click on which will update and display the matrix
     // at each step throughout the row operations in solving.
@@ -121,7 +121,7 @@ function updateRowOperationsContent(content, setRowOperationsContent, setEntryVa
                     key={`row-op-${rowOpNum}`}
                     className={styles["row-op-btn"]}
                     onClick={() => {
-                        setDimensions({m: m, n: n, resetEntriesOnChange: false});
+                        setUserDimensions({m: m, n: n, resetEntriesOnChange: false});
                         setEntryValues(() => {
                             return {matrix: content[1][rowOpNum], constMatrix: content[2][rowOpNum]};
                         });

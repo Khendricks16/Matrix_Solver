@@ -14,12 +14,25 @@
 .matrix-form {
     display: grid;
     grid-template-areas:
-        "left-bracket entries right-bracket"
-        "submit submit submit";
+        "row-labels left-bracket entries right-bracket"
+        "matrix-btns matrix-btns matrix-btns matrix-btns";
     grid-template-columns: auto auto auto;
     gap: 10px;
     align-items: center;
+    justify-items: center;
     max-width: 100%;
+}
+
+/* Row labels */
+.row-labels {
+    grid-area: row-labels;
+    height: 100%;
+    font-weight: bold;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
 }
 
 /* Matrix brackets */
@@ -61,11 +74,7 @@
 }
 
 
-
-/* Matrix submit button */
-.matrix-values-submit {
-    grid-area: submit;
+/* Matrix control buttons */
+.matrix-control-button {
     width: 115px;
-    align-self: center;
-    justify-self: center;
 }

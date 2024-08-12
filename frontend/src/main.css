@@ -13,6 +13,11 @@ h1 {
     line-height: 5vh;
     color: black;
     font-family: Georgia, serif;
+    margin: 15px;
+}
+
+p {
+    margin: 0px;
 }
 
 header {
@@ -30,7 +35,8 @@ footer {
 /* Classes */
 .number-entry {
     text-align: center;
-    max-width: 40px;
+    width: 35px;
+    height: 25px;
 }
 
 .grid-item {

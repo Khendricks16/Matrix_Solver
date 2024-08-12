@@ -54,7 +54,8 @@ function SystemsOfEquations(){
                 <h1 >Enter Dimension for Augmented Matrix:</h1>
                 <p>Note: The largest matrix dimension is 10x10.</p>
                 <CustomMatrix 
-                    isAugmented={true} 
+                    isAugmented={true}
+                    showRowLabels={true} 
                     onSubmission={submitData} 
                     {...{solvingMethod, setRowOperationsContent}}
                 />
