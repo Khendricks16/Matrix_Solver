@@ -1,6 +1,6 @@
 import styles from "./SystemsOfEquations.module.css";
 
-export async function fetchSolvedContent(matrixForm, m, n, method){
+async function fetchSolvedContent(matrixForm, m, n, method){
     // Add all data to a FormData instance
     const formData = new FormData(matrixForm);
     formData.append('m', m);
@@ -24,7 +24,7 @@ export async function fetchSolvedContent(matrixForm, m, n, method){
     return rowOpsContent;
 }
 
-export async function submitData(e, setEntryValues, submissionData){
+export async function submitData(e, matrixStateData, submissionData){
     e.preventDefault();
 
     // No solving method was selected
@@ -35,8 +35,8 @@ export async function submitData(e, setEntryValues, submissionData){
     // Fetch solved data
     let rowOpsContent = await fetchSolvedContent(
                             e.target, 
-                            submissionData["m"], 
-                            submissionData["n"],
+                            matrixStateData["m"], 
+                            matrixStateData["n"],
                             submissionData["solvingMethod"], 
                         );
 
@@ -48,13 +48,16 @@ export async function submitData(e, setEntryValues, submissionData){
         updateRowOperationsContent(
             rowOpsContent,
             submissionData["setRowOperationsContent"],
-            setEntryValues, 
+            matrixStateData["setEntryValues"],
+            matrixStateData["setDimensions"],
+            matrixStateData["m"],
+            matrixStateData["n"],
         );
     }
   
 }
 
-export function updateRowOperationsContent(content, setRowOperationsContent, setEntryValues){
+function updateRowOperationsContent(content, setRowOperationsContent, setEntryValues, setDimensions, m, n){
     // Loops through content, and creates buttons for users to
     // click on which will update and display the matrix
     // at each step throughout the row operations in solving.
@@ -65,7 +68,6 @@ export function updateRowOperationsContent(content, setRowOperationsContent, set
     // Javascript arrays when fetched from backend.
 
     let rowOpText = null;
-
     const rowOpsButtons = content[0].map((rowOpInfo, rowOpNum) => {
         if (rowOpNum == 0){
             rowOpText = "Starting Matrix";
@@ -119,6 +121,7 @@ export function updateRowOperationsContent(content, setRowOperationsContent, set
                     key={`row-op-${rowOpNum}`}
                     className={styles["row-op-btn"]}
                     onClick={() => {
+                        setDimensions({m: m, n: n, resetEntriesOnChange: false});
                         setEntryValues(() => {
                             return {matrix: content[1][rowOpNum], constMatrix: content[2][rowOpNum]};
                         });

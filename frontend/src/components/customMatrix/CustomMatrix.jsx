@@ -29,11 +29,11 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
 
 
     const [userDimensions, setUserDimensions] = useState({ m: 0, n: 0});
-    const [dimensions, setDimensions] = useState({ m: 1, n: 1});
+    const [dimensions, setDimensions] = useState({ m: 1, n: 1, resetEntriesOnChange: true});
     
     const [showAugLine, setShowAugLine] = useState(false);
 
-    const [entryValues, setEntryValues] = useState({matrix: [], constMatrix: []});
+    const [entryValues, setEntryValues] = useState({matrix: [[]], constMatrix: [[]]});
     const [entryButtons, setEntryButtons] = useState([]);
 
 
@@ -50,7 +50,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
     useEffect(() => {
         if (isValidDimensions(userDimensions['m'], userDimensions['n'])){
             // Validated userDimensions
-            setDimensions(userDimensions);
+            setDimensions({...userDimensions, resetEntriesOnChange: true});
         }
         else {
             // Set up Matrix to display the "Invalid Dimensions" in
@@ -62,7 +62,7 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
 
     // When dimensions change:
     //  - Set showAugLine 
-    //  - Set all entry values for matrix to nothing
+    //  - Set all entry values for matrix to nothing if desired
     useEffect(() => {
         const matrix = [];
         const constMatrix = [];
@@ -83,11 +83,10 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
             }
         }
 
-        setEntryValues({
-            matrix: matrix,
-            constMatrix: constMatrix
-        })
-        
+        if (dimensions["resetEntriesOnChange"]){
+            setEntryValues({matrix: matrix, constMatrix: constMatrix});
+        }
+
     }, [dimensions, isAugmented])
 
     
@@ -96,7 +95,6 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
     useEffect(() => {
         setEntryButtons(generateEntryButtons(showAugLine, entryValues, setEntryValues))
     }, [entryValues, dimensions, showAugLine])
-
 
 
     // Dynamic CSS based on dimensions
@@ -117,7 +115,6 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
             height: "80px"
         }
     }
-
     return (
         <>
         {/* Customize Dimensions*/} 
@@ -146,7 +143,16 @@ function CustomMatrix({ isAugmented, onSubmission, ...submissionData }){
        
         {/* Matrix form*/}
         <form 
-            onSubmit={async (e) => await onSubmission(e, setEntryValues, {...submissionData, ...dimensions})} 
+            onSubmit={async (e) => {
+                const matrixStateData = {
+                    setEntryValues,
+                    setDimensions,
+                    ...dimensions
+                }
+                // Always expect your onSubmission function to be called with
+                // e, matrixStateData, SubmissionData
+                await onSubmission(e, matrixStateData, submissionData)} 
+            } 
             className={styles["matrix-form"]}   
         >
             <div className={styles["left-matrix-bracket"]}>
