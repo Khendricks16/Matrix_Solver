@@ -1,19 +1,41 @@
-import { useState } from "react";
+import { useContext, useEffect } from "react";
 
-import { submitData } from "./SystemsOfEquationsHelpers.jsx"
-import CustomMatrix from "../../components/customMatrix/CustomMatrix.jsx";
+import { SystemsOfEquationsContext } from "./SystemsOfEquationsContext.jsx";
+
+import RowOperationsContent from "../../components/systemsOfEquations/RowOperationsContent.jsx";
+import RowOperationsControl from "../../components/systemsOfEquations/RowOperationsControl.jsx";
+import CustomMatrix from "../../components/global/customMatrix/CustomMatrix.jsx";
 
 import styles from "./SystemsOfEquations.module.css"
 
+import { submitData } from "./SubmitMatrix.js";
 
 function SystemsOfEquations(){
-    // State management for page: 
-    // - solvingMethod: Handles the selection logic for radio buttons
-    // - rowOperationsContent: Content to display row operation steps
-    //      in solving process
     
-    const [solvingMethod, setSolvingMethod] = useState('');
-    const [rowOperationsContent, setRowOperationsContent] = useState([]);
+    const {
+        solvingMethod, setSolvingMethod,
+        setSolvedContent,
+        selectedRowOp,
+        rowOpButtonRefs,
+        selectedRowOpStyle,
+        matrixData
+    } = useContext(SystemsOfEquationsContext);
+
+    
+    // Once the selected Row Operation button has changed, update its style
+    useEffect(() => {
+        // Ignore if there is no references to any buttons
+        if (rowOpButtonRefs.current.length == 0){
+            return;
+        }
+       
+        Object.assign(rowOpButtonRefs.current[selectedRowOp.curr].style, selectedRowOpStyle);
+        if (selectedRowOp.prev != -1){
+            Object.assign(rowOpButtonRefs.current[selectedRowOp.prev].style, {border: "", boxShadow: ""});
+        }
+
+
+    }, [selectedRowOp])
 
     return(
         <div className={styles["content"]}>
@@ -56,15 +78,20 @@ function SystemsOfEquations(){
                 <CustomMatrix 
                     isAugmented={true}
                     showRowLabels={true} 
-                    onSubmission={submitData} 
-                    {...{solvingMethod, setRowOperationsContent}}
+                    ref={matrixData}
                 />
+                <button
+                    onClick={async () => await submitData(matrixData, solvingMethod, setSolvedContent)}
+                    >
+                    Solve this Matrix
+                </button>
             </section>
             <section className={styles["row-operations"]}>
                 <h1>Row Operations</h1> 
                 <div className={styles["row-operations-scroll"]}>
-                    {rowOperationsContent}
+                    <RowOperationsContent />
                 </div>
+                <RowOperationsControl />
             </section>
         </div>
     )

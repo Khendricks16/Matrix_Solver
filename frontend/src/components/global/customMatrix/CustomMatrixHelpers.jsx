@@ -138,6 +138,7 @@ export function generateEntryButtons(showAugLine, entryValues, setEntryValues){
         })
         newEntryButtons = newEntryButtons.concat(constEntryButtons);
     }
+    
     return newEntryButtons;
 
 }

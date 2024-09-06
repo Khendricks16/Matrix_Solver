@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle} from "react";
 import PropTypes from "prop-types"
 
 import { isValidDimensions, setUpEntriesGridTemplateArea, generateEntryButtons} from "./CustomMatrixHelpers.jsx"
 
 import styles from "./CustomMatrix.module.css";
 
-
-/**
+/** 
+ * @param {bool} isAugmented -  ...
+ * @param {bool} showRowLabels - ...
+ * @param {function} updateStateRef -  
+ *
  * Returns two things:
  *  1 - A <div> for updating dimensions of the matrix
  *  2 - The matrix itself in the form of a <form>
@@ -15,8 +18,8 @@ import styles from "./CustomMatrix.module.css";
  *  with any other elements being showcased around
  *  the matrix must be done on corresponding page
  *  itself.
- */
-function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission, ...submissionData }){
+ **/
+const CustomMatrix = forwardRef(({ isAugmented = false, showRowLabels = false}, ref) => {
     // State management for component: 
     // - userDimensions: The dimensions typed by user.
     // - dimensions: The validated dimensions used for matrix.
@@ -94,6 +97,7 @@ function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission
     // When dimensions or entryValues change
     //  - Create and set new entry buttons
     useEffect(() => {
+
         setEntryButtons(generateEntryButtons(showAugLine, entryValues, setEntryValues))
     }, [entryValues, dimensions, showAugLine])
 
@@ -116,6 +120,14 @@ function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission
             height: "80px"
         }
     }
+
+    useImperativeHandle(ref, () => ({
+        getDimensions: () => dimensions,
+        getEntryValues: () => entryValues,
+        updateEntryValues: (data) => setEntryValues(data),
+        updateUserDimensions: (data) => setUserDimensions(data)
+    }))
+
     return (
         <>
         {/* Customize Dimensions*/} 
@@ -145,19 +157,7 @@ function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission
         </div>
        
         {/* Matrix form*/}
-        <form 
-            onSubmit={async (e) => {
-                const matrixStateData = {
-                    setEntryValues,
-                    setUserDimensions,
-                    ...dimensions
-                }
-                // Always expect your onSubmission function to be called with
-                // e, matrixStateData, SubmissionData
-                await onSubmission(e, matrixStateData, submissionData)} 
-            } 
-            className={styles["matrix-form"]}   
-        >
+        <form className={styles["matrix-form"]}>
             <div className={styles["row-labels"]}>
             {showRowLabels && isValidDimensions(userDimensions['m'], userDimensions['n']) ? (
                 entryValues.matrix.map((_, rowNum) => {
@@ -191,7 +191,7 @@ function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission
             </div>
             <div style={{gridArea: "matrix-btns"}}>
                 <button 
-                    className={styles["matrix-control-button"]} 
+                    className={styles["control-button"]} 
                     type="button" 
                     onClick={() => {
                     setUserDimensions({m: 0, n: 0});
@@ -200,7 +200,7 @@ function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission
                     Clear Matrix
                 </button>
                 <button 
-                    className={styles["matrix-control-button"]} 
+                    className={styles["control-button"]} 
                     type="button" 
                     onClick={() => {
                     setDimensions({m: dimensions["m"], n: dimensions["n"], resetEntriesOnChange: true});
@@ -208,25 +208,19 @@ function CustomMatrix({ isAugmented = false, showRowLabels = false, onSubmission
                 >
                     Clear Entries
                 </button>
-
-                <input 
-                    className={styles["matrix-control-button"]}
-                    type="submit"
-                    value="Solve This Matrix" 
-                />
             </div>
             
         </form>
         </>
     )
-}
+});
 
 CustomMatrix.propTypes = {
     isAugmented: PropTypes.bool,
     showRowLabels: PropTypes.bool,
-    onSubmission: PropTypes.func,
-    submissionData: PropTypes.object,
 }
+
+CustomMatrix.displayName = "CustomMatrix";
 
 
 export default CustomMatrix;

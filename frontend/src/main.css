@@ -42,3 +42,7 @@ footer {
 .grid-item {
     border: 1px solid rgba(0, 0, 0, 0.8);
 }
+
+.control-button {
+    width: 115px;
+}

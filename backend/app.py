@@ -76,10 +76,10 @@ def process_constant_matrix_data(data: dict, m: int) -> list:
 
 
 def solve_system_of_equations(matrix):
-    if request.form.get("method") == "gaussian-elimination":
+    if request.json["method"] == "gaussian-elimination":
         matrix.gaussian_elimination()
 
-    elif request.form.get("method") == "gauss-jordan-elimination":
+    elif request.json["method"] == "gauss-jordan-elimination":
         matrix.gaussian_elimination(gauss_jordan=True)
     else:
         abort(400, description="Invalid solving method")
@@ -94,13 +94,15 @@ def index():
 @app.route("/system-of-equations", methods=["POST"])
 def system_of_equations():
     if request.method == "POST":
+        """
         # Get full augmented matrix dimension parameters
         m = request.form.get('m', '')
         n = request.form.get('n', '')
 
         # Get augmented matrix data
-        coefficient_matrix_data = dict(filter(lambda pair: pair[0].find("entry") != -1, request.form.items()))
-        constant_matrix_data = dict(filter(lambda pair: pair[0].find("constantEntry") != -1, request.form.items()))
+        coefficient_matrix_data = request.form.get("matrix", "")
+        constant_matrix_data = request.form.get("constMatrix", "")
+
 
         # Process user data
         if not is_valid_matrix_dimensions(m, n):
@@ -112,6 +114,23 @@ def system_of_equations():
 
         coefficient_matrix = process_matrix_data(coefficient_matrix_data, m, n - 1)
         constant_matrix = process_constant_matrix_data(constant_matrix_data, m)
+
+        """
+        # TMP QUICK DEFINITION
+        coefficient_matrix = request.json["matrix"]
+        constant_matrix = request.json["constMatrix"]
+        for i, row in enumerate(coefficient_matrix):
+            for j, num in enumerate(row):
+                coefficient_matrix[i][j] = Fraction(num)
+        
+        for i, row in enumerate(constant_matrix):
+            for j, num in enumerate(row):
+                constant_matrix[i][j] = Fraction(num)
+
+        m = request.json["m"]
+        n = request.json["n"]
+
+
 
         # Define matrix from validated user data
         augmented_matrix = AugmentedMatrix(coefficient_matrix, constant_matrix, dimension=(m, n))
