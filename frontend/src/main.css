@@ -1,0 +1,48 @@
+/* Global styles go here */
+
+:root {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #F8F9FA;
+   
+}
+
+/* Element selectors */
+
+h1 {
+    text-align: center;
+    line-height: 5vh;
+    color: black;
+    font-family: Georgia, serif;
+    margin: 15px;
+}
+
+p {
+    margin: 0px;
+}
+
+header {
+    height: 5vh;
+}
+
+section {
+    height: 100%;
+}
+
+footer {
+    height: 10vh;
+}
+
+/* Classes */
+.number-entry {
+    text-align: center;
+    width: 35px;
+    height: 25px;
+}
+
+.grid-item {
+    border: 1px solid rgba(0, 0, 0, 0.8);
+}
+
+.control-button {
+    width: 115px;
+}

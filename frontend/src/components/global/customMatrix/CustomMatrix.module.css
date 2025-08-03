@@ -1,0 +1,74 @@
+/* Dimension form */
+.dimension-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px;
+}
+
+.dimension-entry {
+    text-align: left;
+}
+
+/* Matrix form layout */
+.matrix-form {
+    display: grid;
+    grid-template-areas:
+        "row-labels left-bracket entries right-bracket"
+        "matrix-btns matrix-btns matrix-btns matrix-btns";
+    grid-template-columns: auto auto auto;
+    gap: 10px;
+    align-items: center;
+    justify-items: center;
+    max-width: 100%;
+}
+
+/* Row labels */
+.row-labels {
+    grid-area: row-labels;
+    height: 100%;
+    font-weight: bold;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+/* Matrix brackets */
+.left-matrix-bracket, .right-matrix-bracket {
+    display: flex;
+    flex-direction: column;
+}
+
+.left-matrix-bracket {
+    grid-area: left-bracket;
+    align-items: flex-start;
+}
+
+.right-matrix-bracket {
+    grid-area: right-bracket;
+    align-items: flex-end;
+}
+
+.vertical-line {
+    width: 2px; 
+    height: 80px;
+    background-color: black;
+}
+
+.horizontal-line {
+    width: 20px;
+    height: 2px;    
+    background-color: black;
+}
+
+/* Matrix entries */
+.matrix-entries {
+    grid-area: entries;
+    
+    display: grid;
+    gap: 5px;
+    justify-content: center; 
+    align-content: center;
+}
